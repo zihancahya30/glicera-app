@@ -1,0 +1,273 @@
+import '../models/faskes_model.dart';
+
+class FaskesData {
+  static List<FaskesModel> getAllFaskes() {
+    return [
+      // PUSKESMAS
+      FaskesModel(
+        id: 'pusk_1',
+        name: 'Puskesmas Manguharjo',
+        type: 'puskesmas',
+        address: 'Jl. Gajah Mada No.124, Kec. Manguharjo, Kota Madiun, Jawa Timur 63127',
+        phone: '(0351) 464661',
+        operationalHours: 'Senin-Kamis: 07.00-11.00, Jumat: 07.00-10.00',
+        services: [
+          'Pemeriksaan kesehatan umum',
+          'Pemeriksaan gula darah',
+          'Pemeriksaan kolesterol',
+          'Pemeriksaan asam urat',
+          'Tes darah lengkap',
+          'Konsultasi kesehatan',
+          'Prolanis (Program Pengelolaan Penyakit Kronis)',
+        ],
+      ),
+      FaskesModel(
+        id: 'pusk_2',
+        name: 'Puskesmas Banjarejo',
+        type: 'puskesmas',
+        address: 'Jl. Bhayangkara No.1, Kec. Taman, Kota Madiun, Jawa Timur 63137',
+        phone: '(0351) 456322',
+        operationalHours: 'Senin-Jumat: 07.00-14.00, Sabtu: 07.00-12.00',
+        services: [
+          'Rawat inap (Puskesmas Perawatan)',
+          'Deteksi dini diabetes mellitus',
+          'Pemeriksaan kesehatan umum',
+          'Layanan gawat darurat',
+          'Laboratorium',
+        ],
+      ),
+      FaskesModel(
+        id: 'pusk_3',
+        name: 'Puskesmas Demangan',
+        type: 'puskesmas',
+        address: 'Jl. Soekarno Hatta No.47, Kel. Demangan, Kec. Taman, Kota Madiun',
+        phone: '(0351) 464308',
+        operationalHours: 'Senin-Jumat: 07.00-14.00',
+        services: [
+          'Pemeriksaan kesehatan umum',
+          'Laboratorium',
+          'Konsultasi kesehatan',
+          'Pemeriksaan gula darah',
+        ],
+      ),
+      FaskesModel(
+        id: 'pusk_4',
+        name: 'Puskesmas Tawangrejo',
+        type: 'puskesmas',
+        address: 'Jl. Tawang Sari No.39, Kec. Kartoharjo, Kota Madiun',
+        phone: '(0351) 462555',
+        operationalHours: 'Senin-Jumat: 07.00-14.00',
+        services: [
+          'Rawat inap',
+          'Pemeriksaan kesehatan umum',
+          'Layanan gawat darurat',
+          'Tes gula darah',
+        ],
+      ),
+      FaskesModel(
+        id: 'pusk_5',
+        name: 'Puskesmas Oro-Oro Ombo',
+        type: 'puskesmas',
+        address: 'Jl. Diponegoro No.22, Kec. Kartoharjo, Kota Madiun',
+        phone: '(0351) 463456',
+        operationalHours: 'Senin-Jumat: 07.00-14.00',
+        services: [
+          'Pemeriksaan kesehatan umum',
+          'Laboratorium',
+          'Konsultasi kesehatan',
+        ],
+      ),
+      
+      // RUMAH SAKIT
+      FaskesModel(
+        id: 'rs_1',
+        name: 'RSUD dr. Soedono Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Dr. Soetomo No.59, Kartoharjo, Kota Madiun, Jawa Timur',
+        phone: '(0351) 454657, 464325, 464326',
+        operationalHours: 'IGD: 24 Jam, Rawat Jalan: Senin-Jumat 08.00-14.00',
+        services: [
+          'Poliklinik Penyakit Dalam',
+          'Poliklinik Endokrin & Metabolik (Diabetes)',
+          'Poliklinik Jantung',
+          'Poliklinik Saraf',
+          'Laboratorium lengkap (HbA1c, Gula Darah)',
+          'IGD 24 Jam',
+          'Rawat Inap',
+          'Konsultasi Gizi',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_2',
+        name: 'RSUD Kota Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Campursari No.12B, Sogaten, Kec. Manguharjo, Kota Madiun 63124',
+        phone: '(0351) 481314',
+        operationalHours: 'IGD: 24 Jam, Poliklinik: Senin-Sabtu 08.00-14.00',
+        services: [
+          'Poliklinik Penyakit Dalam',
+          'Poliklinik Bedah',
+          'Poliklinik Jantung',
+          'Konsultasi Gizi',
+          'Laboratorium',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_3',
+        name: 'RSU Darmayu Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Kapten Tendean No.47, Kel. Demangan, Kec. Taman, Kota Madiun',
+        phone: '(0351) 4109999, WA: 0821-3298-0289',
+        operationalHours: 'IGD & Ambulance: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Poliklinik Spesialis',
+          'Laboratorium lengkap',
+          'Radiologi',
+          'Cuci Darah (Hemodialisa)',
+          'IGD 24 Jam',
+          'Rawat Inap (Kelas 1, 2, 3, VIP, VVIP)',
+          'Farmasi/Apotek',
+          'Ambulance',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_4',
+        name: 'RSU Griya Husada Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Mayjen DI Panjaitan No.22, Kel. Banjarejo, Kec. Taman, Kota Madiun',
+        phone: '(0351) 472801',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Dokter Spesialis',
+          'Laboratorium',
+          'Radiologi',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_5',
+        name: 'RSU Santa Clara Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Biliton No.15, Kel. Madiun Lor, Kec. Manguharjo, Kota Madiun',
+        phone: '(0351) 453499',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Poliklinik Spesialis',
+          'IGD 24 Jam',
+          'ICU',
+          'NICU',
+          'PICU',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_6',
+        name: 'RSU Islam Siti Aisyah',
+        type: 'rumah_sakit',
+        address: 'Jl. Mayjen Sungkono No.38-40, Kel. Nambangan Lor, Kec. Manguharjo, Kota Madiun',
+        phone: '(0351) 464822',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Poliklinik Spesialis',
+          'Laboratorium',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_7',
+        name: 'RS Hermina Madiun',
+        type: 'rumah_sakit',
+        address: 'Jl. Sido Makmur Ring Road Barat, Kel. Manguharjo, Kota Madiun',
+        phone: '0853-35593916',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Poliklinik Spesialis',
+          'Laboratorium',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_8',
+        name: 'RSIA Al Hasanah',
+        type: 'rumah_sakit',
+        address: 'Jl. Sri Rejeki No.91B, Kel. Sukosari, Kec. Kartoharjo, Kota Madiun',
+        phone: '(0351) 463173',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Kesehatan Ibu dan Anak',
+          'Poliklinik Kandungan',
+          'Laboratorium',
+          'Farmasi',
+          'Rawat Jalan & Rawat Inap',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_9',
+        name: 'RS Paru Manguharjo',
+        type: 'rumah_sakit',
+        address: 'Jl. Yos Sudarso 108-112, Manguharjo, Kel. Madiun Lor, Kec. Manguharjo, Kota Madiun',
+        phone: '(0351) 464916',
+        operationalHours: 'Senin-Jumat: 08.00-14.00',
+        services: [
+          'Poliklinik Paru',
+          'Laboratorium',
+          'Radiologi',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_10',
+        name: 'RSUD Dolopo',
+        type: 'rumah_sakit',
+        address: 'Jl. Raya Dolopo No.117, Dolopo, Kabupaten Madiun',
+        phone: '(0351) 365200',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Laboratorium',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_11',
+        name: 'RSUD Caruban',
+        type: 'rumah_sakit',
+        address: 'Jl. A. Yani KM 2, Caruban, Kabupaten Madiun',
+        phone: '(0351) 383956',
+        operationalHours: 'IGD: 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Laboratorium',
+          'IGD 24 Jam',
+        ],
+      ),
+      FaskesModel(
+        id: 'rs_12',
+        name: 'RSUD Dungus',
+        type: 'rumah_sakit',
+        address: 'Jl. Raya Dungus, Wungu, Kabupaten Madiun',
+        phone: '(0351) 456735',
+        operationalHours: 'Pelayanan 24 Jam',
+        services: [
+          'Poliklinik Umum',
+          'Laboratorium',
+          'Rawat Inap (Kelas VIP - Kelas III)',
+          'IGD 24 Jam',
+          'Terima BPJS Kesehatan',
+        ],
+      ),
+    ];
+  }
+
+  static List<FaskesModel> getPuskesmas() {
+    return getAllFaskes().where((f) => f.type == 'puskesmas').toList();
+  }
+
+  static List<FaskesModel> getRumahSakit() {
+    return getAllFaskes().where((f) => f.type == 'rumah_sakit').toList();
+  }
+}
