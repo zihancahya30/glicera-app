@@ -637,7 +637,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         }
         return;
       }
-      final scanId = const Uuid().v4();
+      final scanId = const Uuid().v4(); // ini yang bikin ID dari scan
 
       String? fotoPath;
       try {
