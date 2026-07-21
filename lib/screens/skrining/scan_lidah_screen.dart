@@ -29,8 +29,8 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
   final AuthService _authService = AuthService();
   final ImagePicker _picker = ImagePicker();
 
-  File? _imageFile;
-  File? _croppedImageFile;
+  File? _imageFile; 
+  File? _croppedImageFile; 
   _TongueDetectionResult? _detectionResult;
   bool _isAnalyzing = false;
   bool _isPreparingImage = false;
@@ -46,25 +46,25 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
 
   @override
   void dispose() {
-    _connectivitySubscription?.cancel();
+    _connectivitySubscription?.cancel(); 
     super.dispose();
   }
 
-  Future<void> _initConnectivity() async {
+  Future<void> _initConnectivity() async { 
     final isOnline = await ConnectivityHelper.checkConnection();
-    if (!mounted) {
+    if (!mounted) { 
       return;
     }
     setState(() => _isOnline = isOnline);
     _connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((results) {
+        Connectivity().onConnectivityChanged.listen((results) { 
       if (!mounted) {
         return;
       }
-      setState(() => _isOnline = ConnectivityHelper.isOnlineResult(results));
+      setState(() => _isOnline = ConnectivityHelper.isOnlineResult(results)); 
     });
   }
-
+// bottom navigation bar 
   void _onNavItemTapped(int index) {
     setState(() => _selectedIndex = index);
     switch (index) {
@@ -122,15 +122,15 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
   }
 
   Future<_TongueDetectionResult?> _cropImageForTongue(File imageFile) async {
-    try {
-      final bytes = await imageFile.readAsBytes();
-      final image = img.decodeImage(bytes);
-      if (image == null) {
+    try { 
+      final bytes = await imageFile.readAsBytes(); 
+      final image = img.decodeImage(bytes); 
+      if (image == null) { 
         return null;
       }
 
-      final result = _detectTongueRegion(image);
-      final croppedImage = img.copyCrop(
+      final result = _detectTongueRegion(image); 
+      final croppedImage = img.copyCrop( 
         image,
         x: result.cropRect.left.round(),
         y: result.cropRect.top.round(),
@@ -138,7 +138,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         height: result.cropRect.height.round(),
       );
 
-      final tempPath = imageFile.path.toLowerCase().endsWith('.jpg')
+      final tempPath = imageFile.path.toLowerCase().endsWith('.jpg') 
           ? imageFile.path.replaceAll(
               RegExp(r'\.jpg$', caseSensitive: false), '_cropped.jpg')
           : '${imageFile.path}_cropped.jpg';
@@ -152,12 +152,11 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     }
   }
 
-  _TongueDetectionResult _detectTongueRegion(img.Image image) {
+  _TongueDetectionResult _detectTongueRegion(img.Image image) { 
     final imageSize = Size(image.width.toDouble(), image.height.toDouble());
     final fallbackRect = _defaultCropRect(imageSize);
-
-    final resizedWidth = min(320, image.width);
-    final resizedHeight =
+    final resizedWidth = min(320, image.width); 
+    final resizedHeight = 
         max(1, (image.height * resizedWidth / image.width).round());
     final preview = img.copyResize(
       image,
@@ -166,12 +165,12 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       interpolation: img.Interpolation.average,
     );
 
-    final roiLeft = (preview.width * 0.12).round();
-    final roiTop = (preview.height * 0.18).round();
-    final roiRight = (preview.width * 0.88).round();
+    final roiLeft = (preview.width * 0.12).round(); 
+    final roiTop = (preview.height * 0.18).round(); 
+    final roiRight = (preview.width * 0.88).round(); 
     final roiBottom = (preview.height * 0.88).round();
 
-    final candidateMask = List.generate(
+    final candidateMask = List.generate( 
       preview.height,
       (_) => List<bool>.filled(preview.width, false),
     );
@@ -187,36 +186,34 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         final b = pixel.b.toDouble();
         final maxChannel = max(r, max(g, b));
         final minChannel = min(r, min(g, b));
-        final saturation = maxChannel - minChannel;
-        final brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-        final redness = r - ((g + b) / 2);
-        final normalizedY = (y - roiTop) / max(1, roiBottom - roiTop);
+        final saturation = maxChannel - minChannel; 
+        final brightness = 0.299 * r + 0.587 * g + 0.114 * b; 
+        final redness = r - ((g + b) / 2); 
+        final normalizedY = (y - roiTop) / max(1, roiBottom - roiTop); 
 
-        // ── PERBAIKAN B: turunkan batas brightness atas dari 225 → 195
-        // agar pixel gigi/bibir glossy yang sangat terang tidak lolos filter
         final isTonguePixel = r > g * 1.06 &&
             r > b * 1.04 &&
             redness > 18 &&
             saturation > 20 &&
             brightness > 55 &&
-            brightness < 195 && // ← diturunkan dari 225
+            brightness < 195 && 
             normalizedY > 0.18;
 
-        if (!isTonguePixel) {
+        if (!isTonguePixel) { 
           continue;
         }
 
-        candidateMask[y][x] = true;
+        candidateMask[y][x] = true; 
         candidateCount++;
         totalBrightness += brightness;
 
-        if (x + 1 < roiRight) {
+        if (x + 1 < roiRight) { 
           final nextPixel = preview.getPixel(x + 1, y);
           totalSharpness += (r - nextPixel.r).abs() +
               (g - nextPixel.g).abs() +
               (b - nextPixel.b).abs();
         }
-        if (y + 1 < roiBottom) {
+        if (y + 1 < roiBottom) { 
           final nextPixel = preview.getPixel(x, y + 1);
           totalSharpness += (r - nextPixel.r).abs() +
               (g - nextPixel.g).abs() +
@@ -225,7 +222,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       }
     }
 
-    if (candidateCount < (preview.width * preview.height * 0.01)) {
+    if (candidateCount < (preview.width * preview.height * 0.01)) { 
       return _TongueDetectionResult(
         cropRect: fallbackRect,
         imageSize: imageSize,
@@ -236,7 +233,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       );
     }
 
-    final component = _findBestTongueComponent(
+    final component = _findBestTongueComponent( 
       candidateMask,
       roiLeft: roiLeft,
       roiTop: roiTop,
@@ -245,7 +242,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       previewHeight: preview.height,
     );
 
-    if (component == null || component.pixelCount < 300) {
+    if (component == null || component.pixelCount < 300) { 
       return _TongueDetectionResult(
         cropRect: fallbackRect,
         imageSize: imageSize,
@@ -256,24 +253,24 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       );
     }
 
-    final rawRect = Rect.fromLTRB(
+    final rawRect = Rect.fromLTRB(  
       component.minX.toDouble(),
       component.minY.toDouble(),
       component.maxX.toDouble() + 1,
       component.maxY.toDouble() + 1,
     );
-    final paddingX = rawRect.width * 0.08;
+    final paddingX = rawRect.width * 0.08; 
     final paddingY = rawRect.height * 0.12;
-    final paddedRect = Rect.fromLTRB(
+    final paddedRect = Rect.fromLTRB( 
       max(0.0, rawRect.left - paddingX),
       max(0.0, rawRect.top - paddingY),
       min(preview.width.toDouble(), rawRect.right + paddingX),
       min(preview.height.toDouble(), rawRect.bottom + paddingY),
     );
 
-    final scaleX = image.width / preview.width;
+    final scaleX = image.width / preview.width; 
     final scaleY = image.height / preview.height;
-    final cropRect = Rect.fromLTRB(
+    final cropRect = Rect.fromLTRB( 
       paddedRect.left * scaleX,
       paddedRect.top * scaleY,
       paddedRect.right * scaleX,
@@ -320,7 +317,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
 
   Rect _defaultCropRect(Size size) {
     return Rect.fromLTWH(
-      size.width * 0.2,
+      size.width * 0.2, 
       size.height * 0.25,
       size.width * 0.6,
       size.height * 0.5,
@@ -363,7 +360,6 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     required int roiTop,
     required int roiRight,
     required int roiBottom,
-    // ── PERBAIKAN A: tambah parameter tinggi preview untuk hitung posisi Y relatif
     required int previewHeight,
   }) {
     final visited = List.generate(
@@ -373,8 +369,6 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     _TongueComponent? bestComponent;
     double bestScore = double.negativeInfinity;
     final targetX = (roiLeft + roiRight) / 2;
-
-    // ── PERBAIKAN D: geser targetY dari 0.62 → 0.72 agar lebih ke bawah
     final targetY = roiTop + ((roiBottom - roiTop) * 0.72);
 
     for (int y = roiTop; y < roiBottom; y++) {
@@ -431,15 +425,11 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         final width = maxX - minX + 1;
         final height = maxY - minY + 1;
 
-        // ── PERBAIKAN C: buang komponen yang terlalu lebar dibanding tinggi
-        // Bibir cenderung sangat lebar & pendek (aspectRatio > 2.8)
         final aspectRatio = width / max(1, height);
         if (aspectRatio > 2.8) {
           continue;
         }
 
-        // ── PERBAIKAN A: penalti besar jika center komponen ada di atas 45% frame
-        // Lidah secara anatomi selalu ada di bawah gigi/bibir
         final relativeY = centerY / previewHeight;
         final isLikelyLip = relativeY < 0.45;
         final lipPenalty = isLikelyLip ? 500.0 : 0.0;
@@ -448,7 +438,6 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
             (centerX - targetX).abs() * 1.2 + (centerY - targetY).abs() * 0.9;
         final shapeBonus = height > width * 0.45 ? 120.0 : 0.0;
 
-        // ── lipPenalty ditambahkan ke formula scoring
         final score = pixelCount + shapeBonus - distancePenalty - lipPenalty;
 
         if (score > bestScore) {
@@ -521,7 +510,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     File imageFile, {
     File? croppedImageFile,
   }) async {
-    setState(() {
+    setState(() { 
       _imageFile = imageFile;
       _croppedImageFile = null;
       _detectionResult = null;
@@ -551,14 +540,14 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
   Future<void> _ambilFoto() async {
     try {
       final CapturedTonguePhoto? photo =
-          await Navigator.of(context).push<CapturedTonguePhoto>(
+          await Navigator.of(context).push<CapturedTonguePhoto>( 
         MaterialPageRoute(
           builder: (context) => const KameraLidahScreen(),
-          fullscreenDialog: true,
+          fullscreenDialog: true, 
         ),
       );
-      if (photo == null) {
-        return;
+      if (photo == null) { 
+        return;  
       }
       await _prepareCapturedImage(
         photo.originalFile,
@@ -567,11 +556,11 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     } catch (e) {
       debugPrint('KameraLidahScreen error, fallback ke image_picker: $e');
       try {
-        final XFile? fallbackPhoto = await _picker.pickImage(
+        final XFile? fallbackPhoto = await _picker.pickImage( 
           source: ImageSource.camera,
-          imageQuality: 85,
-          maxWidth: 1000,
-          maxHeight: 1000,
+          imageQuality: 85, 
+          maxWidth: 1000, 
+          maxHeight: 1000, 
         );
         if (fallbackPhoto != null && mounted) {
           await _prepareCapturedImage(File(fallbackPhoto.path));
@@ -609,13 +598,13 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
       return;
     }
 
-    setState(() => _isAnalyzing = true);
+    setState(() => _isAnalyzing = true); 
 
     try {
-      final fileToAnalyze = _croppedImageFile ?? _imageFile!;
-      final result = await _mlService.predict(fileToAnalyze);
+      final fileToAnalyze = _croppedImageFile ?? _imageFile!; 
+      final result = await _mlService.predict(fileToAnalyze); 
 
-      if (!result['success']) {
+      if (!result['success']) { 
         if (mounted) {
           setState(() => _isAnalyzing = false);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -628,7 +617,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         return;
       }
 
-      final userId = _authService.currentUser?.id;
+      final userId = _authService.currentUser?.id; 
       if (userId == null || userId.isEmpty) {
         if (mounted) {
           setState(() => _isAnalyzing = false);
@@ -637,15 +626,15 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         }
         return;
       }
-      final scanId = const Uuid().v4(); // ini yang bikin ID dari scan
+      final scanId = const Uuid().v4(); 
 
       String? fotoPath;
       try {
         fotoPath =
-            await _supabaseService.uploadImage(userId, scanId, _imageFile!);
+            await _supabaseService.uploadImage(userId, scanId, _imageFile!); 
       } catch (_) {}
 
-      final scanResult = ScanResultModel(
+      final scanResult = ScanResultModel( 
         id: scanId,
         userId: userId,
         tanggal: DateTime.now(),
@@ -656,7 +645,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         rekomendasi: List<String>.from(result['rekomendasi']),
       );
 
-      final saveResult = await _supabaseService.saveScanResult(scanResult);
+      final saveResult = await _supabaseService.saveScanResult(scanResult); 
       if (saveResult['success'] != true) {
         if (mounted) {
           setState(() => _isAnalyzing = false);
@@ -673,9 +662,9 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
         return;
       }
 
-      setState(() => _isAnalyzing = false);
+      setState(() => _isAnalyzing = false); 
 
-      if (mounted) {
+      if (mounted) { 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -699,11 +688,11 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     }
   }
 
-  bool _isValidTongueFrameForAnalysis() {
+  bool _isValidTongueFrameForAnalysis() { 
     return _croppedImageFile != null;
   }
 
-  void _showInvalidTongueFrameMessage() {
+  void _showInvalidTongueFrameMessage() { 
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -755,8 +744,8 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) { 
+    return Scaffold( 
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A237E),
@@ -1024,7 +1013,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     );
   }
 
-  Widget _buildBoundingBoxOverlay({required bool hasImage}) {
+  Widget _buildBoundingBoxOverlay({required bool hasImage}) { 
     return CustomPaint(
       painter: _BoundingBoxPainter(
         detectionResult: hasImage ? _detectionResult : null,
@@ -1034,7 +1023,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
     );
   }
 
-  Widget _buildEmptyPreviewHint() {
+  Widget _buildEmptyPreviewHint() { 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -1192,7 +1181,7 @@ class _ScanLidahScreenState extends State<ScanLidahScreen> {
 }
 
 class _BoundingBoxPainter extends CustomPainter {
-  final _TongueDetectionResult? detectionResult;
+  final _TongueDetectionResult? detectionResult; 
   final Color fallbackColor;
 
   _BoundingBoxPainter({
@@ -1201,42 +1190,42 @@ class _BoundingBoxPainter extends CustomPainter {
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size) { 
     final defaultRect = Rect.fromLTWH(
       size.width * 0.2,
       size.height * 0.25,
       size.width * 0.6,
       size.height * 0.5,
     );
-    final rect = detectionResult == null
+    final rect = detectionResult == null 
         ? defaultRect
         : _mapImageRectToCanvas(
             detectionResult!.cropRect,
             detectionResult!.imageSize,
             size,
           );
-    final boxColor = detectionResult?.quality == _FrameQuality.good
+    final boxColor = detectionResult?.quality == _FrameQuality.good 
         ? Colors.green
         : fallbackColor;
 
-    final borderPaint = Paint()
+    final borderPaint = Paint() 
       ..color = boxColor
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
-    final shadowPaint = Paint()
+    final shadowPaint = Paint() 
       ..color = Colors.black.withValues(alpha: 0.4)
       ..style = PaintingStyle.fill;
-    final guidePaint = Paint()
+    final guidePaint = Paint() 
       ..color = boxColor.withValues(alpha: 0.3)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
-    final cornerPaint = Paint()
+    final cornerPaint = Paint() 
       ..color = boxColor
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, rect.top), shadowPaint);
-    canvas.drawRect(
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, rect.top), shadowPaint); 
+    canvas.drawRect( 
         Rect.fromLTWH(0, rect.top, rect.left, rect.height), shadowPaint);
     canvas.drawRect(
         Rect.fromLTWH(
@@ -1248,7 +1237,7 @@ class _BoundingBoxPainter extends CustomPainter {
 
     canvas.drawRect(rect, borderPaint);
 
-    const cornerLength = 20.0;
+    const cornerLength = 20.0; 
     canvas.drawLine(
         rect.topLeft, Offset(rect.left + cornerLength, rect.top), cornerPaint);
     canvas.drawLine(
@@ -1266,31 +1255,31 @@ class _BoundingBoxPainter extends CustomPainter {
     canvas.drawLine(rect.bottomRight,
         Offset(rect.right, rect.bottom - cornerLength), cornerPaint);
 
-    canvas.drawLine(
+    canvas.drawLine( 
       Offset(rect.left, rect.top + rect.height / 2),
       Offset(rect.right, rect.top + rect.height / 2),
       guidePaint,
     );
-    canvas.drawLine(
+    canvas.drawLine( 
       Offset(rect.left + rect.width / 2, rect.top),
       Offset(rect.left + rect.width / 2, rect.bottom),
       guidePaint,
     );
   }
 
-  Rect _mapImageRectToCanvas(Rect imageRect, Size imageSize, Size canvasSize) {
-    final fittedSizes = applyBoxFit(BoxFit.cover, imageSize, canvasSize);
-    final sourceRect = Alignment.center.inscribe(
-      fittedSizes.source,
-      Offset.zero & imageSize,
+  Rect _mapImageRectToCanvas(Rect imageRect, Size imageSize, Size canvasSize) { 
+    final fittedSizes = applyBoxFit(BoxFit.cover, imageSize, canvasSize); 
+    final sourceRect = Alignment.center.inscribe( 
+      fittedSizes.source, 
+      Offset.zero & imageSize, 
     );
-    final destinationRect = Alignment.center.inscribe(
+    final destinationRect = Alignment.center.inscribe( 
       fittedSizes.destination,
-      Offset.zero & canvasSize,
+      Offset.zero & canvasSize, 
     );
-    final scaleX = destinationRect.width / sourceRect.width;
-    final scaleY = destinationRect.height / sourceRect.height;
-    return Rect.fromLTWH(
+    final scaleX = destinationRect.width / sourceRect.width; 
+    final scaleY = destinationRect.height / sourceRect.height; 
+    return Rect.fromLTWH( 
       destinationRect.left + (imageRect.left - sourceRect.left) * scaleX,
       destinationRect.top + (imageRect.top - sourceRect.top) * scaleY,
       imageRect.width * scaleX,
@@ -1351,7 +1340,7 @@ class _TongueDetectionResult {
     String? helperText,
     File? croppedFile,
   }) {
-    return _TongueDetectionResult(
+    return _TongueDetectionResult( 
       cropRect: cropRect ?? this.cropRect,
       imageSize: imageSize ?? this.imageSize,
       quality: quality ?? this.quality,
@@ -1363,12 +1352,12 @@ class _TongueDetectionResult {
 }
 
 class _TongueComponent {
-  final int minX;
+  final int minX; 
   final int minY;
-  final int maxX;
+  final int maxX; 
   final int maxY;
-  final int pixelCount;
-  final double centerX;
+  final int pixelCount; 
+  final double centerX; 
   final double centerY;
 
   const _TongueComponent({

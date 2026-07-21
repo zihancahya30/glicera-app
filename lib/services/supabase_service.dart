@@ -8,25 +8,29 @@ import '../models/rutinitas_model.dart';
 import '../models/scan_result_model.dart';
 
 class SupabaseService {
-  static const String _bucketName = 'scan-photos';
-  final SupabaseClient _supabase = Supabase.instance.client;
+  static const String _bucketName = 'scan-photos'; // Nama bucket di Supabase Storage untuk menyimpan foto hasil skrining
+  final SupabaseClient _supabase = Supabase.instance.client; // Inisialisasi SupabaseClient yang sudah terhubung & terautentikasi (di-setup sekali di main.dart)
 
+  // Urutkan daftar hasil scan dari yang PALING BARU ke paling lama
   List<ScanResultModel> _sortScanResultsByTanggal(
       List<ScanResultModel> results) {
-    results.sort((a, b) => b.tanggal.compareTo(a.tanggal));
+    results.sort((a, b) => b.tanggal.compareTo(a.tanggal)); // Urutkan dari yang terbaru ke yang lama
     return results;
   }
 
+  // Ambil URL signed untuk foto hasil skrining, jika ada path foto tapi belum ada URL
   Future<ScanResultModel> _withSignedImageUrl(ScanResultModel result) async {
     final path = result.fotoPath;
+    // Jika path foto kosong atau sudah ada URL, kembalikan hasil scan apa adanya
     if (path == null || path.isEmpty || result.fotoUrl?.isNotEmpty == true) {
       return result;
     }
     try {
+      // Buat signed URL untuk foto hasil skrining yang tersimpan di Supabase Storage
       final signedUrl = await _supabase.storage
           .from(_bucketName)
-          .createSignedUrl(path, 60 * 60);
-      return ScanResultModel(
+          .createSignedUrl(path, 60 * 60); // Signed URL berlaku selama 1 jam (3600 detik)
+      return ScanResultModel( // bikin object baru dengan signed URL yang sudah diambil
         id: result.id,
         userId: result.userId,
         tanggal: result.tanggal,
@@ -37,11 +41,12 @@ class SupabaseService {
         analisis: result.analisis,
         rekomendasi: result.rekomendasi,
       );
-    } catch (_) {
+    } catch (_) { // Jika gagal bikin signed URL, kembalikan hasil scan apa adanya (tanpa URL)
       return result;
     }
   }
 
+  // Ambil URL signed untuk semua foto hasil skrining
   Future<List<ScanResultModel>> _withSignedImageUrls(
       List<ScanResultModel> results) async {
     return Future.wait(results.map(_withSignedImageUrl));
@@ -52,15 +57,16 @@ class SupabaseService {
   // ─────────────────────────────────────────────────────────────────
 
   Future<String?> uploadImage(
-      String userId, String imageId, File imageFile) async {
+      String userId, String imageId, File imageFile) async { 
     try {
-      final storagePath = '$userId/$imageId.jpg';
-      await _supabase.storage.from(_bucketName).upload(
-            storagePath,
-            imageFile,
+      // Buat path untuk menyimpan foto hasil skrining di Supabase Storage
+      final storagePath = '$userId/$imageId.jpg';  // Format path: userId/imageId.jpg
+      await _supabase.storage.from(_bucketName).upload( // panggil Supabase Storage, target bucket 'scan-photos'
+            storagePath, // path tujuan di storage
+            imageFile, // file gambar yang akan diupload
             fileOptions: const FileOptions(
-              cacheControl: '3600',
-              upsert: true,
+              cacheControl: '3600', // Cache control untuk signed URL (1 jam)
+              upsert: true, // Jika file sudah ada, timpa dengan yang baru
               contentType: 'image/jpeg',
             ),
           );
@@ -70,6 +76,7 @@ class SupabaseService {
     }
   }
 
+  // Simpan hasil skrining ke tabel 'scan_results' di Supabase
   Future<Map<String, dynamic>> saveScanResult(ScanResultModel result) async {
     try {
       await _supabase.from('scan_results').insert(result.toMap());
@@ -92,6 +99,7 @@ class SupabaseService {
     }
   }
 
+  // Ambil riwayat skrining untuk pengguna tertentu
   Future<List<ScanResultModel>> getScanHistory(String userId) async {
     try {
       final rows = await _supabase
@@ -109,6 +117,7 @@ class SupabaseService {
     }
   }
 
+  // Ambil riwayat skrining untuk pengguna tertentu secara real-time (stream)
   Stream<List<ScanResultModel>> streamScanHistory(String userId) {
     if (userId.isEmpty) return Stream.value([]);
 
@@ -126,6 +135,7 @@ class SupabaseService {
         .handleError((_) => <ScanResultModel>[]);
   }
 
+  // Ambil hasil skrining terbaru untuk pengguna tertentu
   Future<ScanResultModel?> getLatestScan(String userId) async {
     try {
       final data = await _supabase
@@ -143,6 +153,7 @@ class SupabaseService {
     }
   }
 
+  // Hapus hasil skrining
   Future<Map<String, dynamic>> deleteScanResult(String scanId) async {
     try {
       final data = await _supabase
@@ -167,12 +178,14 @@ class SupabaseService {
   // RUTINITAS
   // ─────────────────────────────────────────────────────────────────
 
+  // Format tanggal menjadi string "YYYY-MM-DD" untuk digunakan sebagai kunci di tabel 'routine_progress'
   String _dateKey(DateTime date) {
     return '${date.year.toString().padLeft(4, '0')}-'
         '${date.month.toString().padLeft(2, '0')}-'
         '${date.day.toString().padLeft(2, '0')}';
   }
 
+  // Ambil daftar rutinitas aktif milik user tertentu
   Future<List<RutinitasModel>> getUserRoutines(String userId) async {
     try {
       final rows = await _supabase
@@ -190,6 +203,7 @@ class SupabaseService {
     }
   }
 
+  // Simpan rutinitas milik user
   Future<Map<String, dynamic>> saveUserRoutine({
     required String userId,
     required RutinitasModel routine,
@@ -208,8 +222,8 @@ class SupabaseService {
     }
   }
 
-  /// Hapus kebiasaan custom milik user (soft delete: set is_active = false)
-  /// Juga hapus semua progress terkait rutinitas ini
+  // Hapus kebiasaan custom milik user (soft delete: set is_active = false)
+  // Juga hapus semua progress terkait rutinitas ini
   Future<Map<String, dynamic>> deleteUserRoutine({
     required String userId,
     required String routineId,
@@ -250,6 +264,7 @@ class SupabaseService {
     }
   }
 
+  // Ambil progress rutinitas untuk tanggal tertentu
   Future<Map<String, List<String>>> getRoutineProgressForDate({
     required String userId,
     required DateTime date,
@@ -271,6 +286,7 @@ class SupabaseService {
     }
   }
 
+  // Simpan progress rutinitas untuk tanggal tertentu
   Future<Map<String, dynamic>> saveRoutineProgress({
     required String userId,
     required RutinitasModel routine,
@@ -318,6 +334,7 @@ class SupabaseService {
     }
   }
 
+  // Reset progress rutinitas untuk tanggal tertentu
   Future<Map<String, dynamic>> resetRoutineProgressForDate({
     required String userId,
     required DateTime date,

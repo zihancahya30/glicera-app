@@ -88,6 +88,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
         backgroundColor: const Color(0xFF1A237E),
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
+        foregroundColor: Colors.white,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

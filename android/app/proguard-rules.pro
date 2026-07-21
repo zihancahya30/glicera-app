@@ -39,3 +39,18 @@
 -keep class okhttp3.** { *; }
 -keep class kotlin.coroutines.** { *; }
 -keepclassmembers class kotlin.Metadata { *; }
+
+# ============================================================
+# TensorFlow Lite / tflite_flutter
+# ============================================================
+-keep class org.tensorflow.** { *; }
+-keep interface org.tensorflow.** { *; }
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.**
+
+# GPU delegate (kalau ada, aman ditambahkan meski tidak dipakai eksplisit)
+-keep class org.tensorflow.lite.gpu.** { *; }
+-dontwarn org.tensorflow.lite.gpu.**
+
+# Jangan warning soal library native yang di-load lewat reflection
+-dontwarn com.google.android.gms.**

@@ -4,31 +4,36 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import '../core/constants/tongue_color_reference.dart';
 
 class MLService {
-  Interpreter? _interpreter;
-  bool _isInitialized = false;
-  String? _lastError;
+  Interpreter? _interpreter; 
+  bool _isInitialized = false; 
+  String? _lastError; 
 
-  static const int inputSize = 224;
+  static const int inputSize = 224; 
   static const int numChannels = 3;
 
-  Future<void> initialize() async {
+  Future<void> initialize() async { 
     if (_isInitialized) return;
 
     const List<String> paths = [
-      'assets/models/model_resnet50.tflite',
-      'models/model_resnet50.tflite',
+      'assets/models/model_resnet50.tflite',  
+      'models/model_resnet50.tflite',          
     ];
 
     String? lastError;
-    for (final path in paths) {
-      try {
-        _interpreter = await Interpreter.fromAsset(path);
-        _isInitialized = true;
-        _lastError = null;
-        return;
-      } catch (e) {
-        lastError = e.toString();
-        continue;
+    
+    for (final path in paths) { 
+      try { 
+        _interpreter = await Interpreter.fromAsset(path); 
+        
+        _isInitialized = true; 
+        _lastError = null; 
+
+        return; 
+      } catch (e) { 
+
+        lastError = e.toString(); 
+        
+        continue; 
       }
     }
 
@@ -37,8 +42,8 @@ class MLService {
     throw Exception('Gagal memuat model TFLite. $lastError');
   }
 
-  Future<Map<String, dynamic>> predict(File imageFile) async {
-    if (!_isInitialized || _interpreter == null) {
+  Future<Map<String, dynamic>> predict(File imageFile) async { 
+    if (!_isInitialized || _interpreter == null) { 
       try {
         await initialize();
       } catch (e) {
@@ -65,14 +70,17 @@ class MLService {
       final colorFeatures = await _extractColorFeatures(imageFile);
 
       final output = List.filled(1, 0.0).reshape([1, 1]);
+      
       _interpreter!.run(preprocessed, output);
 
       final rawOutput = output[0][0] as double;
 
       final isDiabetes = rawOutput >= 0.5;
+      
       final kategori = isDiabetes ? 'diabetes' : 'non-diabetes';
-      final probDiabetes = rawOutput;
-      final probNonDiabetes = 1 - rawOutput;
+      
+      final probDiabetes = rawOutput;          
+      final probNonDiabetes = 1 - rawOutput;   
 
       final analisis = _generateAnalisis(
         isDiabetes,
@@ -85,12 +93,12 @@ class MLService {
 
       return {
         'success': true,
-        'kategori': kategori,
-        'probabilitas': isDiabetes ? probDiabetes : probNonDiabetes,
-        'probDiabetes': probDiabetes,
-        'probNonDiabetes': probNonDiabetes,
-        'analisis': analisis,
-        'rekomendasi': rekomendasi,
+        'kategori': kategori,                                           
+        'probabilitas': isDiabetes ? probDiabetes : probNonDiabetes,    
+        'probDiabetes': probDiabetes,                                  
+        'probNonDiabetes': probNonDiabetes,                             
+        'analisis': analisis,                                           
+        'rekomendasi': rekomendasi,                                     
       };
     } catch (e) {
       return {'success': false, 'error': 'Gagal melakukan analisis: $e'};
@@ -101,29 +109,30 @@ class MLService {
       File imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
+      
       img.Image? image = img.decodeImage(bytes);
-      if (image == null) return null;
+      if (image == null) return null;  
 
       final resized = img.copyResize(
         image,
-        width: inputSize,
-        height: inputSize,
+        width: inputSize,       
+        height: inputSize,       
         interpolation: img.Interpolation.linear,
       );
 
       final input = List.generate(
-        1,
+        1,  
         (b) => List.generate(
-          inputSize,
+          inputSize,  
           (y) => List.generate(
-            inputSize,
+            inputSize,  
             (x) {
               final pixel = resized.getPixel(x, y);
-              // ResNet50 preprocess_input: konversi RGB→BGR lalu kurangi mean ImageNet
+              
               return [
-                pixel.b.toDouble() - 103.939,  // channel 0 = Blue - mean Blue
-                pixel.g.toDouble() - 116.779,  // channel 1 = Green - mean Green
-                pixel.r.toDouble() - 123.68,   // channel 2 = Red - mean Red
+                pixel.b.toDouble() - 103.939,  
+                pixel.g.toDouble() - 116.779,  
+                pixel.r.toDouble() - 123.68,  
               ];
             },
           ),
@@ -144,20 +153,22 @@ class MLService {
 
       final resized = img.copyResize(image, width: 64, height: 64);
 
-      int startX = resized.width ~/ 4;
+      int startX = resized.width ~/ 4;      
       int endX = resized.width * 3 ~/ 4;
       int startY = resized.height ~/ 4;
       int endY = resized.height * 3 ~/ 4;
 
       double totalR = 0, totalG = 0, totalB = 0;
-      int pixelCount = 0;
+      int pixelCount = 0;  
 
       for (int y = startY; y < endY; y++) {
         for (int x = startX; x < endX; x++) {
           final pixel = resized.getPixel(x, y);
+          
           totalR += pixel.r;
           totalG += pixel.g;
           totalB += pixel.b;
+          
           pixelCount++;
         }
       }
@@ -167,15 +178,17 @@ class MLService {
       final avgR = totalR / pixelCount;
       final avgG = totalG / pixelCount;
       final avgB = totalB / pixelCount;
+      
       final brightness = (avgR * 0.299 + avgG * 0.587 + avgB * 0.114);
+
       final redness = avgR / (avgG + avgB + 1);
 
       return {
-        'avgR': avgR,
-        'avgG': avgG,
-        'avgB': avgB,
-        'brightness': brightness,
-        'redness': redness,
+        'avgR': avgR,          
+        'avgG': avgG,          
+        'avgB': avgB,          
+        'brightness': brightness,  
+        'redness': redness,        
       };
     } catch (e) {
       return {};
@@ -184,13 +197,13 @@ class MLService {
 
   List<String> _generateAnalisis(
     bool isDiabetes,
-    double probabilitasKategori,
-    double probabilitasKebalikan,
+    double probabilitasKategori, 
+    double probabilitasKebalikan, 
     Map<String, double> colorFeatures,
   ) {
     List<String> analisis = [];
-    final persenKategori = (probabilitasKategori * 100).toStringAsFixed(1);
-    final persenKebalikan = (probabilitasKebalikan * 100).toStringAsFixed(1);
+    final persenKategori = (probabilitasKategori * 100).toStringAsFixed(1); 
+    final persenKebalikan = (probabilitasKebalikan * 100).toStringAsFixed(1); 
     final kategoriUtama = isDiabetes ? 'Diabetes' : 'Non-Diabetes';
     final kategoriAlternatif = isDiabetes ? 'Non-Diabetes' : 'Diabetes';
 

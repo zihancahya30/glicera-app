@@ -2,10 +2,10 @@ class ScanResultModel {
   final String id;
   final String userId;
   final DateTime tanggal;
-  final String kategori; // 'diabetes' atau 'non-diabetes'
-  final double probabilitas; // 0.0 - 1.0
+  final String kategori; 
+  final double probabilitas; 
   final String? fotoUrl;
-  final String? fotoPath; // Local path
+  final String? fotoPath; 
   final List<String> analisis;
   final List<String> rekomendasi;
 
@@ -21,15 +21,10 @@ class ScanResultModel {
     required this.rekomendasi,
   });
 
-  // Tingkat kecocokan model terhadap kategori yang dipilih.
   double get probabilitasPersen => probabilitas * 100;
 
-  // Apakah diabetes
   bool get isDiabetes => kategori == 'diabetes';
 
-  // Skor risiko diabetes dalam persen.
-  // Untuk hasil non-diabetes, probabilitas yang tersimpan adalah keyakinan
-  // terhadap non-diabetes, sehingga risiko diabetes adalah kebalikannya.
   double get risikoDiabetesPersen {
     final persen = probabilitasPersen;
     return isDiabetes ? persen : 100 - persen;
@@ -54,7 +49,7 @@ class ScanResultModel {
   String get ringkasanKecocokanModel {
     final persen = probabilitasPersen.toStringAsFixed(0);
     final kategoriHasil = isDiabetes ? 'diabetes' : 'non-diabetes';
-    final risk = risikoDiabetesPersen.toStringAsFixed(0);
+    final risk = risikoDiabetesPersen.toStringAsFixed(0); 
 
     return 'Angka $persen% menunjukkan seberapa kuat pola pada foto lidah cocok '
         'dengan kategori $kategoriHasil menurut model. Ini bukan peluang pasti '
@@ -62,7 +57,6 @@ class ScanResultModel {
         'risiko diabetes sebesar $risk%.';
   }
 
-  // Label probabilitas lama, dipertahankan untuk kompatibilitas.
   String get labelProbabilitas {
     final persen = probabilitasPersen;
     if (isDiabetes) {
@@ -76,7 +70,6 @@ class ScanResultModel {
     }
   }
 
-  // Penjelasan kecocokan model dengan bahasa user-facing.
   String get penjelasanProbabilitas {
     final persen = probabilitasPersen;
     final risk = risikoDiabetesPersen;

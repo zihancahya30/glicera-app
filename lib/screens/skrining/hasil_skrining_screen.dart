@@ -5,14 +5,14 @@ import '../../models/scan_result_model.dart';
 import '../faskes/faskes_screen.dart';
 import '../rutinitas/rutinitas_harian_screen.dart';
 
-class HasilSkriningScreen extends StatelessWidget {
+class HasilSkriningScreen extends StatelessWidget { 
   final ScanResultModel result;
   final File? imageFile;
 
-  const HasilSkriningScreen({
-    super.key,
-    required this.result,
-    this.imageFile,
+  const HasilSkriningScreen({ 
+    super.key, 
+    required this.result, 
+    this.imageFile, 
   });
 
   @override
@@ -48,12 +48,10 @@ class HasilSkriningScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
 
-            // Lingkaran kecocokan hasil
             _buildProbabilityCircle(),
 
             const SizedBox(height: 24),
 
-            // Label Risiko
             Text(
               result.isDiabetes ? 'Diabetes' : 'Non-Diabetes',
               style: TextStyle(
@@ -97,7 +95,6 @@ class HasilSkriningScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Disclaimer
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
@@ -131,22 +128,18 @@ class HasilSkriningScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Penjelasan angka hasil
             _buildPenjelasanProbabilitas(),
 
             const SizedBox(height: 20),
 
-            // Analisis
             _buildAnalisis(),
 
             const SizedBox(height: 20),
 
-            // Rekomendasi
             _buildRekomendasi(),
 
             const SizedBox(height: 24),
 
-            // Tombol Aksi
             _buildActionButtons(context),
 
             const SizedBox(height: 24),
